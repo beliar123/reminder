@@ -11,5 +11,5 @@ class UserRepository(BaseRepository[User]):
         result = await self.session.execute(select(User).where(User.email == email))
         return result.scalar_one_or_none()
 
-    async def create(self, email: str, password: str) -> User:  # type: ignore[override]
-        return await super().create(email=email, password=password)
+    async def create(self, email: str, password: str, **kwargs: str) -> User:  # type: ignore[override]
+        return await super().create(email=email, password=password, **kwargs)

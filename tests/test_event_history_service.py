@@ -62,13 +62,14 @@ async def test_advance_reminder_creates_history_for_personal(user, event_service
 
 
 @pytest.mark.asyncio
-async def test_advance_reminder_no_history_for_birthday(user, event_service, history_service, db_session):
+async def test_advance_reminder_creates_history_for_birthday(user, event_service, history_service, db_session):
     event = await _make_event(event_service, user.id, Category.birthday, Recurrence.yearly)
     history = await history_service.advance_reminder(event.id)
-    assert history is None
+    assert history is not None
+    assert history.event_id == event.id
 
     all_history = await history_service.list_history(user.id, event.id)
-    assert len(all_history) == 0
+    assert len(all_history) == 1
 
 
 @pytest.mark.asyncio

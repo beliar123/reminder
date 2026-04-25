@@ -1,0 +1,304 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8" />
+<title>Beliar — Напоминания</title>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;500&family=Geist:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="ember.css">
+</head>
+<body>
+
+<!-- ══ AUTH OVERLAY ══ -->
+<div id="auth-overlay">
+  <div class="auth-box">
+    <div class="auth-brand">
+      <div class="brand-mark"></div>
+      <div class="brand-name">Beliar<em>.</em></div>
+    </div>
+    <div class="auth-tabs">
+      <div class="auth-tab active" data-tab="login">Войти</div>
+      <div class="auth-tab" data-tab="register">Регистрация</div>
+    </div>
+    <form class="auth-form" id="login-form">
+      <div class="field">
+        <label>Email</label>
+        <input type="email" id="login-email" placeholder="you@example.com" autocomplete="email" required />
+      </div>
+      <div class="field">
+        <label>Пароль</label>
+        <input type="password" id="login-password" placeholder="••••••••" autocomplete="current-password" required />
+      </div>
+      <div class="auth-error" id="login-error"></div>
+      <button type="submit" class="btn-primary">Войти</button>
+    </form>
+    <form class="auth-form hidden" id="register-form">
+      <div class="field">
+        <label>Имя</label>
+        <input type="text" id="reg-name" placeholder="Ваше имя" autocomplete="name" />
+      </div>
+      <div class="field">
+        <label>Email</label>
+        <input type="email" id="reg-email" placeholder="you@example.com" autocomplete="email" required />
+      </div>
+      <div class="field">
+        <label>Пароль</label>
+        <input type="password" id="reg-password" placeholder="••••••••" autocomplete="new-password" required />
+      </div>
+      <div class="auth-error" id="register-error"></div>
+      <button type="submit" class="btn-primary">Создать аккаунт</button>
+    </form>
+  </div>
+</div>
+
+<!-- ══ APP ══ -->
+<div id="app">
+  <div class="app-grid">
+
+    <div class="nav-overlay" id="nav-overlay"></div>
+
+    <!-- ══ SIDEBAR ══ -->
+    <aside class="nav" id="sidebar">
+      <div style="display:flex;align-items:center;gap:10px;">
+        <div class="brand-mark"></div>
+        <div class="brand-name">Beliar<em>.</em></div>
+      </div>
+
+      <div class="nav-section">
+        <div class="nav-label">Просмотр</div>
+        <div class="nav-item active" data-filter="all">
+          <span class="left">
+            <svg viewBox="0 0 16 16"><path d="M3 4h10M3 8h10M3 12h6"/></svg>
+            Все
+          </span>
+          <span class="count" id="nav-count-all">—</span>
+        </div>
+        <div class="nav-item" data-filter="upcoming">
+          <span class="left">
+            <svg viewBox="0 0 16 16"><circle cx="8" cy="8" r="6"/><path d="M8 5v3l2 1.5"/></svg>
+            Предстоящие
+          </span>
+          <span class="count" id="nav-count-upcoming">—</span>
+        </div>
+        <div class="nav-item" data-filter="completed">
+          <span class="left">
+            <svg viewBox="0 0 16 16"><path d="M3 8.5l3 3 7-7"/></svg>
+            Завершённые
+          </span>
+          <span class="count" id="nav-count-completed">—</span>
+        </div>
+        <div class="nav-item" data-filter="recurring">
+          <span class="left">
+            <svg viewBox="0 0 16 16"><path d="M2.5 8a5.5 5.5 0 1 1 2 4.2"/><path d="M2.5 12V8H6.5"/></svg>
+            Повторяющиеся
+          </span>
+          <span class="count" id="nav-count-recurring">—</span>
+        </div>
+      </div>
+
+      <div class="nav-section">
+        <div class="nav-label">Категории</div>
+        <div class="nav-item" data-filter="cat-birthday">
+          <span class="left"><span class="dot birthday"></span>Дни рождения</span>
+          <span class="count" id="nav-count-birthday">—</span>
+        </div>
+        <div class="nav-item" data-filter="cat-anniversary">
+          <span class="left"><span class="dot anniversary"></span>Годовщины</span>
+          <span class="count" id="nav-count-anniversary">—</span>
+        </div>
+        <div class="nav-item" data-filter="cat-meeting">
+          <span class="left"><span class="dot meeting"></span>Встречи</span>
+          <span class="count" id="nav-count-meeting">—</span>
+        </div>
+        <div class="nav-item" data-filter="cat-personal">
+          <span class="left"><span class="dot personal"></span>Личные</span>
+          <span class="count" id="nav-count-personal">—</span>
+        </div>
+      </div>
+
+      <div class="nav-foot">
+        <div class="legend">
+          <span class="k"><span class="b" style="background:var(--ember)"></span>скоро</span>
+          <span class="k"><span class="b" style="background:var(--violet)"></span>повтор</span>
+          <span class="k"><span class="b" style="background:var(--sage)"></span>готово</span>
+        </div>
+        <div class="you">
+          <div class="avatar" id="user-avatar">?</div>
+          <div class="you-meta">
+            <span class="name" id="user-name">…</span>
+            <span class="plan">Beliar</span>
+          </div>
+        </div>
+        <button class="logout-btn" id="logout-btn">Выйти</button>
+      </div>
+    </aside>
+
+    <!-- ══ MAIN ══ -->
+    <main>
+      <div class="topbar">
+        <button class="hamburger" id="hamburger" aria-label="Меню">
+          <svg viewBox="0 0 16 16"><path d="M2 4h12M2 8h12M2 12h12"/></svg>
+        </button>
+        <div class="crumbs">
+          <span>Beliar</span><span class="sep">/</span><span class="here" id="crumb-filter">Все</span>
+        </div>
+        <button class="add-btn" id="open-create-btn">
+          <span class="plus">+</span> Новое напоминание
+        </button>
+      </div>
+
+      <header class="header">
+        <div>
+          <h1 class="title" id="greeting-title">Загрузка<em>…</em></h1>
+          <p class="subtitle" id="greeting-sub"></p>
+        </div>
+        <div class="header-meta">
+          <div class="stat-row">
+            <div class="stat">
+              <span class="num" id="stat-total"><em>—</em></span>
+              <span class="lbl">всего</span>
+            </div>
+            <div class="stat">
+              <span class="num" id="stat-upcoming">—</span>
+              <span class="lbl">предстоит</span>
+            </div>
+            <div class="stat">
+              <span class="num" id="stat-completed">—</span>
+              <span class="lbl">завершено</span>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      <div class="filters" id="filters-bar">
+        <div class="chip on" data-chip="all">Все <span class="ct" id="chip-all-ct">0</span></div>
+        <div class="chip" data-chip="upcoming">Предстоящие <span class="ct" id="chip-upcoming-ct">0</span></div>
+        <div class="chip" data-chip="recurring">Повторяющиеся <span class="ct" id="chip-recurring-ct">0</span></div>
+        <div class="chip" data-chip="completed">Завершённые <span class="ct" id="chip-completed-ct">0</span></div>
+      </div>
+
+      <div id="timeline-container">
+        <div class="loading">Загрузка…</div>
+      </div>
+    </main>
+
+    <!-- ══ DETAIL RAIL ══ -->
+    <aside class="detail" id="detail-rail">
+      <div class="detail-empty" id="detail-empty">
+        Выберите напоминание<br/>чтобы увидеть детали
+      </div>
+      <div id="detail-content" style="display:none; flex-direction:column; gap:24px;">
+
+        <div class="detail-head">
+          <span class="pill" id="detail-pill">● скоро</span>
+          <div class="icon-btns">
+            <button class="icon-btn danger" id="detail-delete-btn" title="Удалить">
+              <svg viewBox="0 0 16 16"><path d="M3 4h10M6 4V2.5h4V4M5 4l.5 9M11 4l-.5 9"/></svg>
+            </button>
+            <button class="icon-btn" id="detail-edit-btn" title="Редактировать">
+              <svg viewBox="0 0 16 16"><path d="M11 3l2 2-8 8H3v-2L11 3z"/></svg>
+            </button>
+          </div>
+        </div>
+
+        <div>
+          <div class="detail-title" id="detail-title"></div>
+          <p class="detail-note" id="detail-note" style="margin-top:14px"></p>
+        </div>
+
+        <div class="field-grid">
+          <div class="field-lbl">Когда</div>
+          <div class="field-val mono" id="detail-when"></div>
+
+          <div class="field-lbl">Категория</div>
+          <div class="field-val" id="detail-category"></div>
+
+          <div class="field-lbl">Повтор</div>
+          <div class="field-val mono" id="detail-recurrence"></div>
+
+          <div class="field-lbl">Создано</div>
+          <div class="field-val mono" id="detail-created"></div>
+        </div>
+
+        <div class="history-section" id="detail-history-section">
+          <div class="history-sub-head">История напоминаний</div>
+          <div class="history-list" id="detail-history-list"></div>
+        </div>
+
+      </div>
+    </aside>
+
+  </div>
+</div>
+
+<!-- ══ CREATE / EDIT MODAL ══ -->
+<div class="modal-overlay hidden" id="event-modal">
+  <div class="modal">
+    <div class="modal-head">
+      <div class="modal-title" id="modal-title">Новое напоминание</div>
+      <button class="modal-close" id="modal-close">×</button>
+    </div>
+    <form id="event-form" style="display:flex;flex-direction:column;gap:16px;">
+      <div class="field">
+        <label>Название *</label>
+        <input type="text" id="ef-title" placeholder="О чём напомнить…" required maxlength="255" />
+      </div>
+      <div class="field">
+        <label>Описание</label>
+        <textarea id="ef-desc" placeholder="Детали, заметки…"></textarea>
+      </div>
+      <div class="field">
+        <label>Категория *</label>
+        <select id="ef-category" required>
+          <option value="">— выберите —</option>
+          <option value="birthday">День рождения</option>
+          <option value="anniversary">Годовщина</option>
+          <option value="meeting">Встреча</option>
+          <option value="personal">Личное</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Повтор *</label>
+        <select id="ef-recurrence" required>
+          <option value="">— выберите —</option>
+          <option value="one_time">Разовое</option>
+          <option value="daily">Ежедневно</option>
+          <option value="weekly">Еженедельно</option>
+          <option value="monthly">Ежемесячно</option>
+          <option value="every_6_months">Каждые 6 месяцев</option>
+          <option value="yearly">Ежегодно</option>
+          <option value="every_18_months">Каждые 18 месяцев</option>
+          <option value="every_2_years">Каждые 2 года</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Дата и время *</label>
+        <input type="datetime-local" id="ef-datetime" required />
+      </div>
+      <div class="modal-error" id="modal-error"></div>
+      <button type="submit" class="btn-primary" id="modal-submit">Создать</button>
+    </form>
+  </div>
+</div>
+
+<!-- ══ DELETE CONFIRM MODAL ══ -->
+<div class="modal-overlay hidden" id="delete-modal">
+  <div class="modal" style="max-width:380px;">
+    <div class="modal-head">
+      <div class="modal-title" style="font-size:20px;">Удалить напоминание?</div>
+      <button class="modal-close" id="delete-modal-close">×</button>
+    </div>
+    <p style="font-size:13.5px;color:var(--bone-dim);line-height:1.6;" id="delete-modal-text"></p>
+    <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:8px;">
+      <button class="logout-btn" id="delete-cancel">Отмена</button>
+      <button class="btn-primary" id="delete-confirm" style="background:#c0392b;box-shadow:none;">Удалить</button>
+    </div>
+  </div>
+</div>
+
+<script src="ember-api.js"></script>
+<script src="ember-app.js"></script>
+</body>
+</html>

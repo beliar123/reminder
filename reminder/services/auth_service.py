@@ -4,12 +4,13 @@ from dataclasses import dataclass
 from datetime import datetime, timedelta, timezone
 
 import jwt
+import structlog
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from reminder.models.user import User
 from reminder.repositories.refresh_token_repository import RefreshTokenRepository
 from reminder.repositories.user_repository import UserRepository
-from reminder.services.user_service import EmailAlreadyExistsError, UserService
+from reminder.services.user_service import EmailAlreadyExistsError, UserService, verify_password
 
 ACCESS_TOKEN_TTL = timedelta(minutes=15)
 REFRESH_TOKEN_TTL = timedelta(days=30)
@@ -27,6 +28,9 @@ class InvalidTokenError(Exception):
 class TokenPair:
     access_token: str
     refresh_token: str
+
+
+logger = structlog.get_logger()
 
 
 class AuthService:
@@ -60,16 +64,18 @@ class AuthService:
             access_token=self._issue_access_token(user.id),
             refresh_token=await self._issue_refresh_token(user.id),
         )
+        logger.info("user.registered", user_id=user.id, email=user.email)
         return user, tokens
 
     async def login(self, email: str, password: str) -> tuple[User, TokenPair]:
         user = await self._user_repo.get_by_email(email)
-        if user is None or not self._user_service.verify_password(password, user.password):
+        if user is None or not verify_password(password, user.password):
             raise InvalidCredentialsError
         tokens = TokenPair(
             access_token=self._issue_access_token(user.id),
             refresh_token=await self._issue_refresh_token(user.id),
         )
+        logger.info("user.logged_in", user_id=user.id)
         return user, tokens
 
     async def refresh_access_token(self, raw_refresh_token: str) -> str:
@@ -90,4 +96,5 @@ class AuthService:
             payload = jwt.decode(token, self._secret, algorithms=["HS256"])
             return int(payload["sub"])
         except jwt.PyJWTError:
+            logger.warning("token.invalid")
             raise InvalidTokenError

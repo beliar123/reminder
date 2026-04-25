@@ -19,5 +19,5 @@ class Recurrence(StrEnum):
     every_2_years = "every_2_years"
 
 
-CATEGORIES_WITH_HISTORY = {Category.anniversary, Category.meeting, Category.personal}
+CATEGORIES_WITH_HISTORY = {Category.birthday, Category.anniversary, Category.meeting, Category.personal}
 CATEGORIES_YEARLY_ONLY = {Category.birthday, Category.anniversary}

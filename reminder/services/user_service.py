@@ -1,12 +1,23 @@
+import hashlib
 from dataclasses import dataclass
 
-from passlib.context import CryptContext
+import bcrypt
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from reminder.models.user import User
 from reminder.repositories.user_repository import UserRepository
 
-_pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+
+def _prepare(password: str) -> bytes:
+    return hashlib.sha256(password.encode()).digest()
+
+
+def hash_password(password: str) -> str:
+    return bcrypt.hashpw(_prepare(password), bcrypt.gensalt()).decode()
+
+
+def verify_password(plain: str, hashed: str) -> bool:
+    return bcrypt.checkpw(_prepare(plain), hashed.encode())
 
 
 class UserNotFoundError(Exception):
@@ -33,8 +44,7 @@ class UserService:
         existing = await self._repo.get_by_email(email)
         if existing is not None:
             raise EmailAlreadyExistsError(email)
-        hashed = _pwd_context.hash(password)
-        kwargs: dict = {"email": email, "password": hashed}
+        kwargs: dict = {"email": email, "password": hash_password(password)}
         if name is not None:
             kwargs["name"] = name
         if timezone is not None:
@@ -60,10 +70,7 @@ class UserService:
         if data.timezone is not None:
             updates["timezone"] = data.timezone
         if data.password is not None:
-            updates["password"] = _pwd_context.hash(data.password)
+            updates["password"] = hash_password(data.password)
         if not updates:
             return user
         return await self._repo.update(user, **updates)
-
-    def verify_password(self, plain: str, hashed: str) -> bool:
-        return _pwd_context.verify(plain, hashed)

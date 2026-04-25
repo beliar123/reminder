@@ -19,5 +19,6 @@ class EventHistory(Base):
     )
     completed_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
     notes: Mapped[str | None] = mapped_column(Text, nullable=True)
+    notified_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
 
     event: Mapped["Event"] = relationship("Event", back_populates="history")  # type: ignore[name-defined]  # noqa: F821

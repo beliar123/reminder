@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from sqlalchemy import select
 
 from reminder.enums import Category
@@ -19,4 +21,13 @@ class EventRepository(BaseRepository[Event]):
         if category is not None:
             query = query.where(Event.category == category)
         result = await self.session.execute(query.order_by(Event.next_remind_at.asc().nulls_last()))
+        return list(result.scalars().all())
+
+    async def get_due(self, now: datetime) -> list[Event]:
+        result = await self.session.execute(
+            select(Event).where(
+                Event.next_remind_at <= now,
+                Event.is_completed.is_(False),
+            )
+        )
         return list(result.scalars().all())

@@ -1,10 +1,9 @@
-import os
-
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from reminder.api.dependencies import get_session
 from reminder.api.schemas.auth import LoginRequest, RefreshRequest, RegisterRequest, TokenResponse
+from reminder.api.settings import api_settings
 from reminder.services.auth_service import AuthService, InvalidCredentialsError, InvalidTokenError
 from reminder.services.user_service import EmailAlreadyExistsError
 
@@ -12,8 +11,7 @@ router = APIRouter(prefix="/auth", tags=["auth"])
 
 
 def _auth_service(session: AsyncSession = Depends(get_session)) -> AuthService:
-    secret = os.environ.get("SECRET_KEY", "")
-    return AuthService(session, secret)
+    return AuthService(session, api_settings.secret_key)
 
 
 @router.post("/register", response_model=TokenResponse, status_code=status.HTTP_201_CREATED)

@@ -1,0 +1,65 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: reminder
+      POSTGRES_PASSWORD: reminder
+      POSTGRES_DB: reminder
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U reminder -d reminder"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  redis:
+    image: redis:7-alpine
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  migrate:
+    build: .
+    command: alembic upgrade head
+    env_file: .env
+    environment:
+      DATABASE_URL: postgresql+asyncpg://reminder:reminder@postgres:5432/reminder
+    depends_on:
+      postgres:
+        condition: service_healthy
+    restart: "no"
+
+  api:
+    build: .
+    command: >
+      gunicorn reminder.api.app:app
+      --worker-class uvicorn.workers.UvicornWorker
+      --workers ${WEB_CONCURRENCY:-4}
+      --bind 0.0.0.0:8000
+      --access-logfile -
+      --disable-redirect-access-to-syslog
+    env_file: .env
+    ports:
+      - "8000:8000"
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+
+  worker:
+    build: .
+    command: arq reminder.worker.main.WorkerSettings
+    env_file: .env
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+      redis:
+        condition: service_healthy
+
+volumes:
+  postgres_data:
+  redis_data:

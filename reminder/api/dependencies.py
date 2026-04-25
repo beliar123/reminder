@@ -1,23 +1,16 @@
-import os
 from collections.abc import AsyncGenerator
 
 from fastapi import Depends, HTTPException, status
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from reminder.api.settings import api_settings
 from reminder.database import AsyncSessionFactory
 from reminder.models.user import User
 from reminder.services.auth_service import AuthService, InvalidTokenError
 from reminder.services.user_service import UserNotFoundError, UserService
 
 _bearer = HTTPBearer()
-
-
-def get_secret_key() -> str:
-    key = os.environ.get("SECRET_KEY")
-    if not key:
-        raise RuntimeError("SECRET_KEY environment variable is not set")
-    return key
 
 
 async def get_session() -> AsyncGenerator[AsyncSession, None]:
@@ -30,8 +23,7 @@ async def get_current_user(
     credentials: HTTPAuthorizationCredentials = Depends(_bearer),
     session: AsyncSession = Depends(get_session),
 ) -> User:
-    secret = get_secret_key()
-    auth_service = AuthService(session, secret)
+    auth_service = AuthService(session, api_settings.secret_key)
     try:
         user_id = auth_service.decode_access_token(credentials.credentials)
     except InvalidTokenError:

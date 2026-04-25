@@ -29,6 +29,17 @@ class EventHistoryRepository(BaseRepository[EventHistory]):
         )
         return list(result.scalars().all())
 
+    async def get_by_event_and_scheduled(
+        self, event_id: int, scheduled_at: datetime
+    ) -> EventHistory | None:
+        result = await self.session.execute(
+            select(EventHistory).where(
+                EventHistory.event_id == event_id,
+                EventHistory.scheduled_at == scheduled_at,
+            )
+        )
+        return result.scalar_one_or_none()
+
     async def list_by_event_paginated(
         self, event_id: int, cursor: int | None = None, limit: int = 20
     ) -> list[EventHistory]:

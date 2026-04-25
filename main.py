@@ -2,7 +2,7 @@ import uvicorn
 
 
 def main() -> None:
-    uvicorn.run("reminder.api.app:app", host="0.0.0.0", port=8000, reload=False)
+    uvicorn.run("reminder.api.app:app", host="0.0.0.0", port=8000, reload=False, access_log=False)
 
 
 if __name__ == "__main__":
