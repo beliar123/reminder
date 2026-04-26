@@ -12,5 +12,6 @@ class AppSettings(BaseSettings):
     smtp_from: str
     log_level: str = "info"
     log_format: str = "console"
+    email_template_path: str = "reminder/worker/templates/reminder_email.html"
 
     model_config = {"env_file": ".env", "case_sensitive": False, "extra": "ignore"}

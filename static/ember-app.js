@@ -529,12 +529,23 @@ document.getElementById('delete-confirm').addEventListener('click', async () => 
   if (res && (res.ok || res.status === 204)) {
     document.getElementById('delete-modal').classList.add('hidden');
     selectedEventId = null;
-    renderDetail(null);
+    editingEventId = null;
     await loadEvents();
+    renderDetail(null);
   }
 });
 
 /* ── Create / Edit modal ── */
+function enforceRecurrenceForCategory(categoryValue) {
+  const rec = document.getElementById('ef-recurrence');
+  if (categoryValue === 'birthday' || categoryValue === 'anniversary') {
+    rec.value = 'yearly';
+    rec.disabled = true;
+  } else {
+    rec.disabled = false;
+  }
+}
+
 document.getElementById('open-create-btn').addEventListener('click', openCreateModal);
 
 function openCreateModal() {
@@ -544,6 +555,7 @@ function openCreateModal() {
   document.getElementById('event-form').reset();
   document.getElementById('ef-datetime').value = toLocalISOString(new Date(Date.now() + 3600000));
   document.getElementById('modal-error').textContent = '';
+  enforceRecurrenceForCategory(document.getElementById('ef-category').value);
   document.getElementById('event-modal').classList.remove('hidden');
 }
 
@@ -560,8 +572,13 @@ function openEditModal(id) {
   document.getElementById('ef-datetime').value = ev.next_remind_at
     ? toLocalISOString(new Date(ev.next_remind_at)) : '';
   document.getElementById('modal-error').textContent = '';
+  enforceRecurrenceForCategory(ev.category);
   document.getElementById('event-modal').classList.remove('hidden');
 }
+
+document.getElementById('ef-category').addEventListener('change', e => {
+  enforceRecurrenceForCategory(e.target.value);
+});
 
 document.getElementById('modal-close').addEventListener('click', () => {
   document.getElementById('event-modal').classList.add('hidden');
@@ -599,6 +616,9 @@ document.getElementById('event-form').addEventListener('submit', async e => {
     }
     document.getElementById('event-modal').classList.add('hidden');
     await loadEvents();
+    if (editingEventId !== null && selectedEventId === editingEventId) {
+      renderDetail(allEvents.find(e => e.id === editingEventId) || null);
+    }
   } catch {
     errEl.textContent = 'Ошибка соединения';
   } finally {

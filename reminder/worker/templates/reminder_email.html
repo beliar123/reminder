@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Напоминание</title>
+</head>
+<body style="margin:0;padding:0;background-color:#0c0b0a;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;-webkit-font-smoothing:antialiased;">
+  <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color:#0c0b0a;min-height:100vh;">
+    <tr>
+      <td align="center" style="padding:48px 16px;">
+        <table width="100%" cellpadding="0" cellspacing="0" border="0" style="max-width:520px;">
+
+          <!-- Header -->
+          <tr>
+            <td style="padding-bottom:32px;">
+              <table cellpadding="0" cellspacing="0" border="0">
+                <tr>
+                  <td style="padding-right:10px;vertical-align:middle;">
+                    <div style="width:8px;height:8px;border-radius:50%;background-color:#f5854a;"></div>
+                  </td>
+                  <td style="vertical-align:middle;">
+                    <span style="font-family:'Courier New',Courier,monospace;font-size:11px;letter-spacing:0.12em;text-transform:uppercase;color:#6b6760;">ember reminder</span>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+
+          <!-- Greeting -->
+          <tr>
+            <td style="padding-bottom:24px;">
+              <p style="margin:0;font-size:22px;font-weight:400;color:#ece6dc;letter-spacing:-0.02em;">
+                Привет, <span style="color:#f5854a;">$user_name</span> —
+              </p>
+              <p style="margin:8px 0 0;font-size:13px;color:#6b6760;letter-spacing:0.01em;">
+                пора не забыть
+              </p>
+            </td>
+          </tr>
+
+          <!-- Event card -->
+          <tr>
+            <td style="padding-bottom:32px;">
+              <table width="100%" cellpadding="0" cellspacing="0" border="0"
+                     style="background-color:#131211;border:1px solid #232220;border-radius:8px;overflow:hidden;">
+                <!-- Accent bar -->
+                <tr>
+                  <td style="height:3px;background-color:#f5854a;font-size:0;line-height:0;">&nbsp;</td>
+                </tr>
+                <!-- Card content -->
+                <tr>
+                  <td style="padding:24px 28px;">
+                    <p style="margin:0 0 4px;font-size:18px;font-weight:500;color:#ece6dc;letter-spacing:-0.01em;">$event_title</p>
+                    $description_block
+                    <!-- Date/time -->
+                    <table cellpadding="0" cellspacing="0" border="0" style="margin-top:20px;">
+                      <tr>
+                        <td style="padding-right:8px;vertical-align:middle;">
+                          <span style="font-size:13px;color:#6b6760;">&#128197;</span>
+                        </td>
+                        <td style="vertical-align:middle;">
+                          <span style="font-family:'Courier New',Courier,monospace;font-size:12px;color:#a39e94;letter-spacing:0.04em;">$scheduled_date</span>
+                          <span style="font-family:'Courier New',Courier,monospace;font-size:12px;color:#6b6760;margin:0 4px;">·</span>
+                          <span style="font-family:'Courier New',Courier,monospace;font-size:12px;color:#f5854a;letter-spacing:0.04em;">$scheduled_time</span>
+                        </td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+
+          <!-- Divider -->
+          <tr>
+            <td style="padding-bottom:24px;">
+              <div style="height:1px;background-color:#232220;"></div>
+            </td>
+          </tr>
+
+          <!-- Footer -->
+          <tr>
+            <td>
+              <p style="margin:0;font-family:'Courier New',Courier,monospace;font-size:10px;letter-spacing:0.08em;text-transform:uppercase;color:#44413c;">
+                ember &mdash; это автоматическое письмо, отвечать не нужно
+              </p>
+            </td>
+          </tr>
+
+        </table>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>

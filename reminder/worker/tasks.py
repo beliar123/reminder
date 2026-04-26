@@ -60,12 +60,16 @@ async def send_reminder(ctx: dict, event_id: int, scheduled_at: datetime) -> Non
     if user is None:
         return
 
+    user_name = user.name or user.email.split("@")[0]
+
     try:
         await send_reminder_email(
             to=user.email,
+            user_name=user_name,
             event_title=event.title,
             scheduled_at=scheduled_at,
             settings=settings,
+            event_description=event.description,
         )
     except Exception:
         logger.error("reminder.failed", event_id=event_id, exc_info=True)
