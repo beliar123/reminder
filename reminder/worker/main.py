@@ -5,7 +5,7 @@ from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_asyn
 
 from reminder.logging import configure_logging
 from reminder.worker.settings import AppSettings
-from reminder.worker.tasks import poll_due_reminders, send_reminder
+from reminder.worker.tasks import poll_due_reminders, send_nag, send_reminder
 
 _app_settings = AppSettings()
 
@@ -34,7 +34,7 @@ async def on_shutdown(ctx: dict) -> None:
 
 
 class WorkerSettings:
-    functions = [send_reminder]
+    functions = [send_reminder, send_nag]
     cron_jobs = [cron(poll_due_reminders, minute={*range(0, 60)})]
     on_startup = on_startup
     on_shutdown = on_shutdown

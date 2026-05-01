@@ -15,6 +15,8 @@ class CreateEventData:
     recurrence: Recurrence
     next_remind_at: datetime
     description: str | None = None
+    remind_interval: int | None = None
+    remind_max_attempts: int | None = None
 
 
 @dataclass
@@ -24,6 +26,8 @@ class UpdateEventData:
     category: Category | None = None
     recurrence: Recurrence | None = None
     next_remind_at: datetime | None = None
+    remind_interval: int | None = None
+    remind_max_attempts: int | None = None
 
 
 class EventNotFoundError(Exception):
@@ -48,6 +52,8 @@ class EventService:
             category=data.category,
             recurrence=recurrence,
             next_remind_at=data.next_remind_at,
+            remind_interval=data.remind_interval,
+            remind_max_attempts=data.remind_max_attempts,
         )
 
     async def get_event(self, user_id: int, event_id: int) -> Event:
@@ -69,6 +75,10 @@ class EventService:
             updates["description"] = data.description
         if data.next_remind_at is not None:
             updates["next_remind_at"] = data.next_remind_at
+        if data.remind_interval is not None:
+            updates["remind_interval"] = data.remind_interval
+        if data.remind_max_attempts is not None:
+            updates["remind_max_attempts"] = data.remind_max_attempts
 
         new_category = data.category if data.category is not None else event.category
         new_recurrence = data.recurrence if data.recurrence is not None else event.recurrence

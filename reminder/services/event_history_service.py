@@ -1,4 +1,4 @@
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -40,10 +40,16 @@ class EventHistoryService:
 
         history: EventHistory | None = None
         if event.category in CATEGORIES_WITH_HISTORY:
+            next_nag_at = (
+                now + timedelta(minutes=event.remind_interval)
+                if event.remind_interval
+                else None
+            )
             history = await self._history_repo.create(
                 event_id=event_id,
                 scheduled_at=scheduled_at,
                 reminded_at=now,
+                next_nag_at=next_nag_at,
             )
 
         if event.recurrence == Recurrence.one_time:
@@ -73,6 +79,7 @@ class EventHistoryService:
             history,
             completed_at=datetime.now(tz=timezone.utc),
             notes=notes,
+            next_nag_at=None,
         )
 
     async def list_history(self, user_id: int, event_id: int) -> list[EventHistory]:

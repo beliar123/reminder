@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from sqlalchemy import Boolean, DateTime, Enum, ForeignKey, String, Text, func
+from sqlalchemy import Boolean, DateTime, Enum, ForeignKey, Integer, String, Text, func
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from reminder.enums import Category, Recurrence
@@ -18,6 +18,8 @@ class Event(Base):
     recurrence: Mapped[Recurrence] = mapped_column(Enum(Recurrence), nullable=False)
     next_remind_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
     is_completed: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False)
+    remind_interval: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    remind_max_attempts: Mapped[int | None] = mapped_column(Integer, nullable=True)
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), server_default=func.now(), nullable=False
     )

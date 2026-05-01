@@ -277,6 +277,27 @@
         <label>Дата и время *</label>
         <input type="datetime-local" id="ef-datetime" required />
       </div>
+      <div class="field">
+        <label>Повторять напоминание</label>
+        <select id="ef-remind-interval">
+          <option value="">Не повторять</option>
+          <option value="15">Каждые 15 минут</option>
+          <option value="30">Каждые 30 минут</option>
+          <option value="60">Каждый час</option>
+          <option value="180">Каждые 3 часа</option>
+          <option value="480">Каждые 8 часов</option>
+          <option value="1440">Каждые 24 часа</option>
+        </select>
+      </div>
+      <div class="field" id="ef-max-attempts-field" style="display:none;">
+        <label>Максимум напоминаний</label>
+        <select id="ef-remind-max-attempts">
+          <option value="">Без ограничений</option>
+          <option value="3">3 раза</option>
+          <option value="5">5 раз</option>
+          <option value="10">10 раз</option>
+        </select>
+      </div>
       <div class="modal-error" id="modal-error"></div>
       <button type="submit" class="btn-primary" id="modal-submit">Создать</button>
     </form>

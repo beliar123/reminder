@@ -546,6 +546,11 @@ function enforceRecurrenceForCategory(categoryValue) {
   }
 }
 
+function enforceNagVisibility() {
+  const interval = document.getElementById('ef-remind-interval').value;
+  document.getElementById('ef-max-attempts-field').style.display = interval ? '' : 'none';
+}
+
 document.getElementById('open-create-btn').addEventListener('click', openCreateModal);
 
 function openCreateModal() {
@@ -556,6 +561,7 @@ function openCreateModal() {
   document.getElementById('ef-datetime').value = toLocalISOString(new Date(Date.now() + 3600000));
   document.getElementById('modal-error').textContent = '';
   enforceRecurrenceForCategory(document.getElementById('ef-category').value);
+  enforceNagVisibility();
   document.getElementById('event-modal').classList.remove('hidden');
 }
 
@@ -571,14 +577,19 @@ function openEditModal(id) {
   document.getElementById('ef-recurrence').value = ev.recurrence;
   document.getElementById('ef-datetime').value = ev.next_remind_at
     ? toLocalISOString(new Date(ev.next_remind_at)) : '';
+  document.getElementById('ef-remind-interval').value = ev.remind_interval ?? '';
+  document.getElementById('ef-remind-max-attempts').value = ev.remind_max_attempts ?? '';
   document.getElementById('modal-error').textContent = '';
   enforceRecurrenceForCategory(ev.category);
+  enforceNagVisibility();
   document.getElementById('event-modal').classList.remove('hidden');
 }
 
 document.getElementById('ef-category').addEventListener('change', e => {
   enforceRecurrenceForCategory(e.target.value);
 });
+
+document.getElementById('ef-remind-interval').addEventListener('change', enforceNagVisibility);
 
 document.getElementById('modal-close').addEventListener('click', () => {
   document.getElementById('event-modal').classList.add('hidden');
@@ -596,12 +607,16 @@ document.getElementById('event-form').addEventListener('submit', async e => {
   errEl.textContent = '';
   btn.disabled = true;
 
+  const remindIntervalRaw = document.getElementById('ef-remind-interval').value;
+  const remindMaxAttemptsRaw = document.getElementById('ef-remind-max-attempts').value;
   const body = {
     title: document.getElementById('ef-title').value.trim(),
     description: document.getElementById('ef-desc').value.trim() || null,
     category: document.getElementById('ef-category').value,
     recurrence: document.getElementById('ef-recurrence').value,
     next_remind_at: new Date(document.getElementById('ef-datetime').value).toISOString(),
+    remind_interval: remindIntervalRaw ? parseInt(remindIntervalRaw) : null,
+    remind_max_attempts: remindMaxAttemptsRaw ? parseInt(remindMaxAttemptsRaw) : null,
   };
 
   try {

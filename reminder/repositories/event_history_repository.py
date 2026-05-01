@@ -14,12 +14,25 @@ class EventHistoryRepository(BaseRepository[EventHistory]):
         event_id: int,
         scheduled_at: datetime,
         reminded_at: datetime,
+        attempt_count: int = 1,
+        next_nag_at: datetime | None = None,
     ) -> EventHistory:
         return await super().create(
             event_id=event_id,
             scheduled_at=scheduled_at,
             reminded_at=reminded_at,
+            attempt_count=attempt_count,
+            next_nag_at=next_nag_at,
         )
+
+    async def get_due_nags(self, now: datetime) -> list[EventHistory]:
+        result = await self.session.execute(
+            select(EventHistory).where(
+                EventHistory.next_nag_at <= now,
+                EventHistory.completed_at.is_(None),
+            )
+        )
+        return list(result.scalars().all())
 
     async def list_by_event(self, event_id: int) -> list[EventHistory]:
         result = await self.session.execute(

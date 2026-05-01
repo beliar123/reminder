@@ -25,6 +25,8 @@ async def create_event(
             category=body.category,
             recurrence=body.recurrence,
             next_remind_at=body.next_remind_at,
+            remind_interval=body.remind_interval,
+            remind_max_attempts=body.remind_max_attempts,
         ),
     )
     return EventResponse.model_validate(event)
@@ -73,6 +75,8 @@ async def update_event(
                 category=body.category,
                 recurrence=body.recurrence,
                 next_remind_at=body.next_remind_at,
+                remind_interval=body.remind_interval,
+                remind_max_attempts=body.remind_max_attempts,
             ),
         )
     except EventNotFoundError:
